@@ -1,58 +1,44 @@
-name: Android Debug Build
+name: Build Android Debug APK
 
 on:
   push:
+    branches: [ main, master ]
   pull_request:
-  workflow_dispatch:
-
-permissions:
-  contents: read
-
-concurrency:
-  group: android-build-${{ github.ref }}
-  cancel-in-progress: true
+    branches: [ main, master ]
 
 jobs:
-  build-debug-apk:
-    name: Build debug APK
+  build:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
-
-    env:
-      GRADLE_VERSION: "8.7"
-      MODEL_PATH: app/src/main/assets/hand_landmarker.task
-      MODEL_URL: https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/latest/hand_landmarker.task
 
     steps:
-      - name: Check out repository
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
-          distribution: temurin
-          java-version: "17"
+          distribution: 'temurin'
+          java-version: '17'
 
-      - name: Set up Gradle CLI (used only to create the wrapper)
+      - name: Setup Gradle CLI
         uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-version: ${{ env.GRADLE_VERSION }}
 
       - name: Create Gradle Wrapper if it is missing
         run: |
           if [ ! -f gradlew ] || [ ! -f gradle/wrapper/gradle-wrapper.jar ]; then
-            gradle wrapper --gradle-version "$GRADLE_VERSION" --distribution-type bin
+            gradle wrapper --gradle-version "${GRADLE_VERSION:-8.5}"
           fi
           chmod +x gradlew
           ./gradlew --version
 
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
+        with:
+          accept-android-sdk-licenses: true
 
       - name: Install Android SDK components
         run: |
-          yes | sdkmanager --licenses > /dev/null || true
-          sdkmanager "platforms;android-34" "build-tools;34.0.0" "platform-tools"
+          echo "y" | sdkmanager "platforms;android-34" "build-tools;34.0.0" "platform-tools"
 
       - name: Download MediaPipe hand model if missing
         run: |
@@ -67,28 +53,10 @@ jobs:
           fi
 
       - name: Build debug APK
-        run: ./gradlew --no-daemon --stacktrace :app:assembleDebug
-
-      - name: Prepare APK for upload
-        run: |
-          cp app/build/outputs/apk/debug/app-debug.apk MotionSensorAI-debug.apk
-          ls -lh MotionSensorAI-debug.apk
+        run: ./gradlew assembleDebug
 
       - name: Upload debug APK
         uses: actions/upload-artifact@v4
         with:
-          name: MotionSensorAI-debug-apk
-          path: MotionSensorAI-debug.apk
-          if-no-files-found: error
-          retention-days: 14
-
-      - name: Upload build reports on failure
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: build-reports-on-failure
-          path: |
-            app/build/reports/
-            **/build/outputs/logs/
-          if-no-files-found: ignore
-          retention-days: 7
+          name: app-debug.apk
+          path: app/build/outputs/apk/debug/app-debug.apk
