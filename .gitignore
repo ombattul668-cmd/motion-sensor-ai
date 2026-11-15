@@ -1,0 +1,13 @@
+*.iml
+.gradle/
+local.properties
+.idea/
+.DS_Store
+build/
+captures/
+.externalNativeBuild/
+.cxx/
+*.apk
+
+# MediaPipe model is downloaded by the CI workflow (or placed manually)
+app/src/main/assets/hand_landmarker.task

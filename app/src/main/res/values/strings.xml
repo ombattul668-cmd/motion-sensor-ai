@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Motion Sensor AI</string>
+    <string name="app_title">MOTION SENSOR AI</string>
+    <string name="start">START</string>
+    <string name="stop">STOP</string>
+    <string name="status_standby">Standby. Press START to scan for your hand.</string>
+    <string name="status_scanning">Scanning. Show one hand to the camera.</string>
+    <string name="status_paused">Camera stopped because the app left the screen.</string>
+    <string name="status_permission_denied">Camera permission is required to track your hand.</string>
+    <string name="status_camera_error">Camera error: %1$s</string>
+    <string name="hand_not_detected">Hand: not detected</string>
+    <string name="hand_detected">Hand: %1$d detected · %2$s · %3$d%%</string>
+    <string name="fps_format">Tracking: %1$d FPS</string>
+</resources>

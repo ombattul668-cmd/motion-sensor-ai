@@ -1,0 +1,2 @@
+Place hand_landmarker.task in this folder (app/src/main/assets/).
+Download link and steps are in the project README.md.
